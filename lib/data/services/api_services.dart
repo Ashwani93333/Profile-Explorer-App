@@ -5,7 +5,7 @@ import '../model/user_model.dart';
 class ApiService {
   static const String baseUrl = "https://randomuser.me/api/?results=20";
 
-  Future<UserModel> fetchUsers() async {
+    static Future<UserModel> fetchUsers() async {
     final response = await http.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {

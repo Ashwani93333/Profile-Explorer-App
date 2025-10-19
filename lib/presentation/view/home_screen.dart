@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:profile_exploler/presentation/widgets/home_card.dart';
-
+import 'package:lottie/lottie.dart';
+import 'package:profile_exploler/data/model/user_model.dart';
+import 'package:profile_exploler/data/services/api_services.dart';
+import 'package:profile_exploler/presentation/view/profileDetail_screen.dart';
 import '../viewModel/home_viewModel.dart';
-import '../viewModel/user_ViewModel.dart';
 
 class HomeScreen extends StatelessWidget {
-  final HomeViewModel controller = Get.put(HomeViewModel());
+  final HomeViewmodel controller = Get.put(HomeViewmodel());
 
   HomeScreen({super.key});
 
@@ -20,63 +20,96 @@ class HomeScreen extends StatelessWidget {
         }
 
         if (controller.userList.isEmpty) {
-          return Center(child: Text("No data "),);
+          return Center(child: Text("No data "));
         }
 
-        return
-          GridView.builder(
+        return RefreshIndicator(onRefresh: ()async{await UserModel;}, child: Padding(
+            padding: EdgeInsetsGeometry.all(7),
+        child: GridView.builder(
+        itemCount: controller.userList.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+        ),
+        itemBuilder: (context, index) {
+        final user = controller.userList[index];
 
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-          ),
-          itemBuilder: (context, index) {
-            final user = controller.userList[index];
-            return Padding(padding: EdgeInsetsGeometry.all(6), child: Container(
-                height: 260,
-                width: 213,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                child: Stack(
-                  children: [
-
-                    Image.network(user.picture?.medium ?? "", height: 260,
-                      width: 213,
-                      fit: BoxFit.cover,),
-                    Positioned(
-                        left: 13,
-                        bottom: 13,
-                        right: 13,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(user.name?.first ?? "RAvan", style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 20),),
-                                SizedBox(height: 5,),
-                                Text("location", style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14),),
-
-                              ],
-                            ),
-                            IconButton(onPressed: () {},
-                                icon: Icon(Icons.heart_broken_rounded))
-
-                          ],
-                        ))
-                  ],
-                )
-            ),);
-          },
+        return GestureDetector(
+        onTap: () {
+        Get.to(
+        () => ProfileDetailScreen(),
+        arguments: controller.userList[index],
         );
-      }
-      ),
+        },
+        child: Stack(
+        children: [
+        ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Hero(
+        tag: user.firstName,
+        child: Image.network(
+        user.imageMedium,
+        height: 260,
+        width: 213,
+        fit: BoxFit.cover,
+        ),
+        ),
+        ),
+        Positioned(
+        left: 10,
+        bottom: 13,
+        child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+        Text(
+        user.firstName,
+        style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w800,
+        fontSize: 25,
+        ),
+        ),
+        SizedBox(height: 5),
+        Text(
+        user.city,
+        style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w500,
+        fontSize: 21,
+        ),
+        ),
+        ],
+        ),
+        ),
+        Positioned(
+        right: 15,
+        bottom: 13,
+        child: GestureDetector(
+        onTap: (){controller.toggleLike(index);},
+        child: Image.asset(
+        "assets/images/heart.png",
+        height: 30,
+        width: 30,
+        color:
+        controller.likedStatus[index] == true ? Colors.red : Colors.white
+        ),
+        )
+
+        )
+        ],
+        ),);
+        },
+        )
+        ,
+        )
+        ,
+        );
+      },)
+
+
+      ,
+
     );
   }
 }
